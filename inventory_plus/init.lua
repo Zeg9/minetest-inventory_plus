@@ -42,6 +42,20 @@ inventory_plus.register_button = function(player,name,...)
 	table.insert(inventory_plus.buttons[player_name], name)
 end
 
+inventory_plus.remove_button = function(player,name)
+	local player_name = player:get_player_name()
+	if inventory_plus.buttons[player_name] == nil then
+		inventory_plus.buttons[player_name] = {}
+	end
+	local index = nil
+	for i, n in ipairs(inventory_plus.buttons[player_name]) do
+		if n == name then
+			index = i
+		end
+	end
+	table.remove(inventory_plus.buttons[player_name], index)
+end
+
 -- set_inventory_formspec
 inventory_plus.set_inventory_formspec = function(player,formspec)
 	if minetest.setting_getbool("creative_mode") then
