@@ -71,6 +71,9 @@ end
 -- get_formspec
 inventory_plus.get_formspec = function(player,page)
 	local get_buttons = function(ox,oy)
+		if not inventory_plus.buttons[player:get_player_name()] then
+			return ""
+		end
 		local formspec = ""
 		local x,y=ox,oy
 		for _, i in ipairs(inventory_plus.buttons[player:get_player_name()]) do
