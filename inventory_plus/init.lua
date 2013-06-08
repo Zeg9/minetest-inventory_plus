@@ -21,6 +21,10 @@ TODO:
 -- expose api
 inventory_plus = {}
 
+-- tell that we are inventory++, not inventory_plus
+-- ...so mods know if they can use our functions
+inventory_plus.plusplus = true
+
 -- define buttons
 inventory_plus.buttons = {}
 
