@@ -12,6 +12,8 @@ License: GPLv3
 --[[
 TODO:
  * Include a few button textures, especially for "abandoned" mods
+   -> Done: bags
+   -> Todo: home GUI, mobf settings (if it still exists),...
  * Limit the number of buttons displayed, and then:
  * Multiple button pages (inventory can only display 9 buttons, and creative 6)
  * Fallback to text if no image is present ?
