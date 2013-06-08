@@ -110,7 +110,13 @@ end)
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	-- main
 	if fields.main then
-		inventory_plus.set_inventory_formspec(player, inventory_plus.get_formspec(player,"main"))
+		if minetest.setting_getbool("creative_mode") then
+			minetest.after(0.01,function()
+				inventory_plus.set_inventory_formspec(player, inventory_plus.get_formspec(player,"main"))
+			end)
+		else
+			inventory_plus.set_inventory_formspec(player, inventory_plus.get_formspec(player,"main"))
+		end
 		return
 	end
 	if fields.creative_prev or fields.creative_next then
