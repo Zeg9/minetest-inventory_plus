@@ -1,7 +1,7 @@
 ----------------------------------
-Inventory Plus+ for Minetest
+Inventory ++ for Minetest
 ----------------------------------
-                    forked by Zeg9
+            Fork of Inventory Plus
 
 Copyright (c) 2012 cornernote, Brett O'Donnell <cornernote@gmail.com>
 Copyright (c) 2013 Zeg9 <dazeg9@gmail.com>
