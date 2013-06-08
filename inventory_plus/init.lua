@@ -31,10 +31,13 @@ inventory_plus.default = minetest.setting_get("inventory_default") or "main"
 inventory_plus.inventory = {}
 
 -- register_button
-inventory_plus.register_button = function(player,name)
+inventory_plus.register_button = function(player,name,...)
 	local player_name = player:get_player_name()
 	if inventory_plus.buttons[player_name] == nil then
 		inventory_plus.buttons[player_name] = {}
+	end
+	for _, i in ipairs(inventory_plus.buttons[player_name]) do
+		if i == name then return end -- only register buttons once
 	end
 	table.insert(inventory_plus.buttons[player_name], name)
 end
