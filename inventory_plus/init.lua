@@ -8,6 +8,14 @@ License: GPLv3
 
 ]]--
 
+--[[
+TODO:
+ * Include a few button textures, especially for "abandoned" mods
+ * Limit the number of buttons displayed, and then:
+ * Multiple button pages (inventory can only display 9 buttons, and creative 6)
+ * Fallback to text if no image is present ?
+]]--
+
 
 -- expose api
 inventory_plus = {}
@@ -16,15 +24,18 @@ inventory_plus = {}
 inventory_plus.buttons = {}
 
 -- default inventory page
-inventory_plus.default = minetest.setting_get("inventory_default") or "craft"
+inventory_plus.default = minetest.setting_get("inventory_default") or "main"
+
+-- original inventory formspec, per player
+inventory_plus.inventory = {}
 
 -- register_button
-inventory_plus.register_button = function(player,name,label)
+inventory_plus.register_button = function(player,name)
 	local player_name = player:get_player_name()
 	if inventory_plus.buttons[player_name] == nil then
 		inventory_plus.buttons[player_name] = {}
 	end
-	inventory_plus.buttons[player_name][name] = label
+	table.insert(inventory_plus.buttons[player_name], name)
 end
 
 -- set_inventory_formspec
@@ -41,97 +52,34 @@ end
 
 -- get_formspec
 inventory_plus.get_formspec = function(player,page)
-	local formspec = "size[8,7.5]"
-	
-	-- player inventory
-	formspec = formspec .. "list[current_player;main;0,3.5;8,4;]"
-
-	-- craft page
-	if page=="craft" then
-		formspec = formspec
-			.."button[0,0;2,0.5;main;Back]"
-			.."list[current_player;craftpreview;7,1;1,1;]"
-		if minetest.setting_getbool("inventory_craft_small") then
-			formspec = formspec.."list[current_player;craft;3,0;2,2;]"
-			player:get_inventory():set_width("craft", 2)
-			player:get_inventory():set_size("craft", 2*2)
-		else
-			formspec = formspec.."list[current_player;craft;3,0;3,3;]"
-			player:get_inventory():set_width("craft", 3)
-			player:get_inventory():set_size("craft", 3*3)
-		end
-	end
-	
-	-- creative page
-	if page=="creative" then
-		return player:get_inventory_formspec()
-			.."button[5,0;2,0.5;main;Back]"
-			.."label[6,1.5;Trash:]"
-			.."list[detached:trash;main;6,2;1,1;]"
-			.."label[5,1.5;Refill:]"
-			.."list[detached:refill;main;5,2;1,1;]"
-	end
-	
-	-- main page
-	if page=="main" then
-		-- buttons
-		local x,y=0,0
-		for k,v in pairs(inventory_plus.buttons[player:get_player_name()]) do
-			formspec = formspec .. "button["..x..","..y..";2,0.5;"..k..";"..v.."]"
-			x=x+2
-			if x == 8 then
-				x=0
-				y=y+1
+	local get_buttons = function(ox,oy)
+		local formspec = ""
+		local x,y=ox,oy
+		for _, i in ipairs(inventory_plus.buttons[player:get_player_name()]) do
+			formspec = formspec .. "image_button["..x..","..y..";1,1;inventory_plus_"..i..".png;"..i..";]"
+			x=x+1
+			if x >= ox+3 then
+				y = y+1
+				x = ox
 			end
 		end
+		return formspec
 	end
-	
-	return formspec
+	-- craft page
+	if page=="main" then
+		if minetest.setting_getbool("creative_mode") then
+			return player:get_inventory_formspec()
+				.. get_buttons(5,0)
+		else
+			return inventory_plus.inventory[player:get_player_name()]
+				.. get_buttons(0,0)
+		end
+	end
 end
-
--- trash slot
-inventory_plus.trash = minetest.create_detached_inventory("trash", {
-	allow_put = function(inv, listname, index, stack, player)
-		if minetest.setting_getbool("creative_mode") then
-			return stack:get_count()
-		else
-			return 0
-		end
-	end,
-	on_put = function(inv, listname, index, stack, player)
-		inv:set_stack(listname, index, nil)
-	end,
-})
-inventory_plus.trash:set_size("main", 1)
-
--- refill slot
-inventory_plus.refill = minetest.create_detached_inventory("refill", {
-	allow_put = function(inv, listname, index, stack, player)
-		if minetest.setting_getbool("creative_mode") then
-			return stack:get_count()
-		else
-			return 0
-		end
-	end,
-	on_put = function(inv, listname, index, stack, player)
-		inv:set_stack(listname, index, ItemStack(stack:get_name().." "..stack:get_stack_max()))
-	end,
-})
-inventory_plus.refill:set_size("main", 1)
 
 -- register_on_joinplayer
 minetest.register_on_joinplayer(function(player)
-	if minetest.setting_getbool("inventory_craft_small") then
-		player:get_inventory():set_width("craft", 2)
-		player:get_inventory():set_size("craft", 2*2)
-	else
-		player:get_inventory():set_width("craft", 3)
-		player:get_inventory():set_size("craft", 3*3)
-	end
-	inventory_plus.register_button(player,"craft","Craft")
-	if minetest.setting_getbool("creative_mode") then
-		inventory_plus.register_button(player,"creative_prev","Creative")
-	end
+	inventory_plus.inventory[player:get_player_name()] = player:get_inventory_formspec()
 	minetest.after(1,function()
 		inventory_plus.set_inventory_formspec(player,inventory_plus.get_formspec(player, inventory_plus.default))
 	end)
@@ -144,15 +92,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		inventory_plus.set_inventory_formspec(player, inventory_plus.get_formspec(player,"main"))
 		return
 	end
-	-- craft
-	if fields.craft then
-		inventory_plus.set_inventory_formspec(player, inventory_plus.get_formspec(player,"craft"))
-		return
-	end
-	-- creative
 	if fields.creative_prev or fields.creative_next then
 		minetest.after(0.01,function()
-			inventory_plus.set_inventory_formspec(player, inventory_plus.get_formspec(player,"creative"))
+			inventory_plus.set_inventory_formspec(player, inventory_plus.get_formspec(player,"main"))
 		end)
 		return
 	end

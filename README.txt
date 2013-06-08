@@ -1,10 +1,12 @@
 ----------------------------------
 Inventory Plus for Minetest
 ----------------------------------
+                      fork by Zeg9
 
 Copyright (c) 2012 cornernote, Brett O'Donnell <cornernote@gmail.com>
-Source Code: https://github.com/cornernote/minetest-inventory_plus
-Home Page: https://sites.google.com/site/cornernote/minetest/inventory-plus
+Copyright (c) 2013 Zeg9 <dazeg9@gmail.com>
+Source Code: https://github.com/Zeg9/minetest-inventory_plus
+Original Home Page: https://sites.google.com/site/cornernote/minetest/inventory-plus
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
