@@ -24,7 +24,7 @@ TODO:
 inventory_plus = {}
 
 -- tell that we are inventory++, not inventory_plus
--- ...so mods know if they can use our functions
+-- ...so mods know if they can use our functions like remove_button
 inventory_plus.plusplus = true
 
 -- define buttons
@@ -76,7 +76,7 @@ end
 
 -- get_formspec
 inventory_plus.get_formspec = function(player,page)
-	local get_buttons = function(ox,oy)
+	local get_buttons = function(ox,oy,mx) -- origin x, origin y, max x
 		if not inventory_plus.buttons[player:get_player_name()] then
 			return ""
 		end
@@ -85,7 +85,7 @@ inventory_plus.get_formspec = function(player,page)
 		for _, i in ipairs(inventory_plus.buttons[player:get_player_name()]) do
 			formspec = formspec .. "image_button["..x..","..y..";1,1;inventory_plus_"..i..".png;"..i..";]"
 			x=x+1
-			if x >= ox+3 then
+			if x >= ox+mx then
 				y = y+1
 				x = ox
 			end
@@ -96,10 +96,10 @@ inventory_plus.get_formspec = function(player,page)
 	if page=="main" then
 		if minetest.setting_getbool("creative_mode") then
 			return player:get_inventory_formspec()
-				.. get_buttons(5,0)
+				.. get_buttons(6,0,2)
 		else
 			return inventory_plus.inventory[player:get_player_name()]
-				.. get_buttons(0,0)
+				.. get_buttons(0,0,3)
 		end
 	end
 end
