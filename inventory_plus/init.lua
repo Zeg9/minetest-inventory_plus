@@ -11,11 +11,8 @@ License: GPLv3
 
 --[[
 TODO:
- * Include a few button textures, especially for "abandoned" mods
-   -> Done: bags
-   -> Todo: home GUI, mobf settings (if it still exists),...
  * Limit the number of buttons displayed, and then:
- * Multiple button pages (inventory can only display 9 buttons, and creative 6)
+ * Multiple button pages (inventory can only display 6 buttons)
  * Fallback to text if no image is present ?
 ]]--
 
@@ -99,7 +96,7 @@ inventory_plus.get_formspec = function(player,page)
 				.. get_buttons(6,0,2)
 		else
 			return inventory_plus.inventory[player:get_player_name()]
-				.. get_buttons(0,0,2)
+				.. get_buttons(0,.5,2)
 		end
 	end
 end
